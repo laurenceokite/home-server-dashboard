@@ -1,0 +1,27 @@
+{
+  "name": "home-server-dashboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./server/dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laurenceokite/home-server-dashboard.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laurenceokite/home-server-dashboard/issues"
+  },
+  "homepage": "https://github.com/laurenceokite/home-server-dashboard#readme",
+  "devDependencies": {
+    "@types/node": "^20.11.15",
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21"
+  }
+}

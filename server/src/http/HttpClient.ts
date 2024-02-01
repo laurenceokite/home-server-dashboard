@@ -1,12 +1,12 @@
 import type { HttpClientRequest, HttpClientResponse } from "./http.types";
 
 export class HttpClient {
-    constructor(private baseUrl: string, private defaultHeaders: HeadersInit = {}) {}
+    constructor(private baseUrl: string, private headers: HeadersInit) {}
 
     private async request<T>(request: HttpClientRequest): Promise<HttpClientResponse<T>> {
         let { url, method, body, headers } = request;
-
-        headers = { ...this.defaultHeaders, ...headers };
+        
+        headers = { ...this.headers, ...headers };
 
         const response = await fetch(`${this.baseUrl}${url}`, {
             method,
@@ -35,7 +35,7 @@ export class HttpClient {
         return this.request<T>({ url, method: 'GET', headers });
     }
 
-    post<T>(url: string, body: any, headers?: HeadersInit): Promise<HttpClientResponse<T>> {
+    post<T>(url: string, body: unknown, headers?: HeadersInit): Promise<HttpClientResponse<T>> {
         return this.request<T>({ url, method: 'POST', body, headers });
     }
 }
