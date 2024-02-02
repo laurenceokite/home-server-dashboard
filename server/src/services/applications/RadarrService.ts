@@ -1,35 +1,34 @@
-import { HttpClient } from "../http/HttpClient";
-import { ApplicationName, type ApplicationFolderStatus, type ApplicationMonitorService, type ApplicationQueueStatus, type RadarrMonitor, OfflineMonitor, ApplicationInstance, ApplicationStatusResponse } from "../types";
+import { HttpClient } from "../../http/HttpClient";
+import type { 
+    ApplicationFolderStatus,  
+    ApplicationQueueStatus,  
+    RadarrMonitor, 
+    OfflineMonitor, 
+    ApplicationInstance 
+} from "../../types";
+import ApplicationMonitorService from "./ApplicationMonitorService";
+import { AppEventEmitter } from "../../events/appEmitter";
+
 import type { DiskSpaceResponse, HealthResponse, QueueStatusResponse, RootFolderResponse } from "./radarr.types";
 
-export class ArrService extends HttpClient implements ApplicationMonitorService<ArrMonitor> {
-    readonly metadata: {
-        app: ApplicationName,
-        icon: string
-    };
+export default class RadarrService extends ApplicationMonitorService<RadarrMonitor> {
+    readonly icon = "movie-roll";
+    private readonly httpClient: HttpClient;
 
-    constructor(private instance: ApplicationInstance, headers: HeadersInit) {
-        super(instance.baseUrl, headers);
+    constructor(private instance: ApplicationInstance<RadarrMonitor>, emitter: AppEventEmitter) {
+        super(emitter, instance.pollInterval);
 
-        if (instance.app == ApplicationName.Radarr) {
-            this.metadata = {
-                app: instance.app,
-                icon: "movie-roll"
-            }
+        const headers: HeadersInit = {};
 
-        } else if (instance.app == ApplicationName.Sonarr) {
-            this.metadata = {
-                app: instance.app,
-                icon: "television-classic"
-            }
-
-        } else {
-            throw new Error(`${instance.app} instance cannot be used in ArrService constructor`)
+        if (this.instance.apiKey) {
+            const apiKeyHeader = { "X-Api-Key": this.instance.apiKey };
+            Object.assign(headers, apiKeyHeader);
         }
 
+        this.httpClient = new HttpClient(instance.baseUrl, headers);
     }
 
-    async getStatus(): Promise<ArrMonitor | OfflineMonitor> {
+    async getStatus(): Promise<RadarrMonitor | OfflineMonitor> {
         const errors: string[] = [];
         const warnings: string[] = [];
 
@@ -38,8 +37,9 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
         if (!up) {
             return {
                 up,
-                ...this.metadata,
+                uuid: this.uuid
                 ...this.instance,
+                icon: this.instance.icon ?? this.icon,
                 errors: ['Could not connect to Radarr server.'],
             }
         }
@@ -58,8 +58,9 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
 
         const status: RadarrMonitor = {
             up,
-            ...this.metadata,
+            uuid: this.uuid,
             ...this.instance,
+            icon: this.icon,
             queued,
             rootFolders,
             errors,
@@ -70,7 +71,7 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
     }
 
     async ping(): Promise<boolean> {
-        const response = await this.get("ping");
+        const response = await this.httpClient.get("ping");
         return response.ok && response.status == 200;
     }
 
@@ -80,7 +81,7 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
             hasErrors: true,
         };
 
-        const response = await this.get<QueueStatusResponse>("api/v3/queue/status");
+        const response = await this.httpClient.get<QueueStatusResponse>("api/v3/queue/status");
         if (!response.ok) {
             return [
                 status, 
@@ -97,7 +98,7 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
     async getRootFolderStatus(): Promise<[ApplicationFolderStatus[], string | null]> {
         const status: ApplicationFolderStatus[] = [];
 
-        const folderResponse = await this.get<RootFolderResponse[]>("api/v3/rootfolder");
+        const folderResponse = await this.httpClient.get<RootFolderResponse[]>("api/v3/rootfolder");
         if (!folderResponse.ok) {
             const placeholder: ApplicationFolderStatus = {
                 path: "unknown",
@@ -109,7 +110,7 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
 
         folderResponse.data.forEach(response => status.push(this.folderResponseToStatus(response)));
 
-        const diskSpaceResponse = await this.get<DiskSpaceResponse[]>("api/v3/diskspace");
+        const diskSpaceResponse = await this.httpClient.get<DiskSpaceResponse[]>("api/v3/diskspace");
         if (!diskSpaceResponse.ok) {
             return [status, "Error retrieving disk space."];
         }
@@ -127,7 +128,7 @@ export class ArrService extends HttpClient implements ApplicationMonitorService<
     }
 
     async healthCheck(errors: string[], warnings: string[]): Promise<void> {
-        const response = await this.get<HealthResponse[]>("api/v3/health");
+        const response = await this.httpClient.get<HealthResponse[]>("api/v3/health");
 
         if (!response.ok) {
             errors.push("Error while retrieving... errors.");
