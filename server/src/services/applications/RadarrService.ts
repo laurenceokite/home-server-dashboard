@@ -16,7 +16,7 @@ export default class RadarrService extends ApplicationMonitorService<RadarrMonit
     private readonly httpClient: HttpClient;
 
     constructor(private instance: ApplicationInstance<RadarrMonitor>, emitter: AppEventEmitter) {
-        super(emitter, instance.pollInterval);
+        super(emitter, instance.pollIntervalMs);
 
         const headers: HeadersInit = {};
 
@@ -37,7 +37,7 @@ export default class RadarrService extends ApplicationMonitorService<RadarrMonit
         if (!up) {
             return {
                 up,
-                uuid: this.uuid
+                uuid: this.uuid,
                 ...this.instance,
                 icon: this.instance.icon ?? this.icon,
                 errors: ['Could not connect to Radarr server.'],

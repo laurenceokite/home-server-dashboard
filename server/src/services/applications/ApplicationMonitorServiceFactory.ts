@@ -6,7 +6,9 @@ import RadarrService from "./RadarrService";
 
 export default class ApplicationMonitorServiceFactory {
     static createService<T extends ApplicationMonitor>(instance: ApplicationInstance<T>, emitter: AppEventEmitter): ApplicationMonitorService<T> {
-        switch (instance.app) {
+        const { app } = instance;
+
+        switch (app) {
             case ApplicationName.Radarr:
                 return new RadarrService(instance, emitter) as ApplicationMonitorService<T>;            
             default:

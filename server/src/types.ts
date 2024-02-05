@@ -12,12 +12,12 @@ export interface DashboardConfiguration {
 
 export interface ApplicationInstance<T extends ApplicationMonitor> {
     app: T["app"];
-    linkUrl: string;
     baseUrl: string;
-    apiKey: string;
+    linkUrl?: string;
+    apiKey?: string;
     name?: string;
     icon?: string;
-    pollInterval?: number;
+    pollIntervalMs?: number;
 }
 
 export interface BaseApplicationMonitor extends Monitor, ApplicationInstance<any> {} 
@@ -46,10 +46,10 @@ export interface DownloadClientMonitor {
 export type ApplicationMonitor = RadarrMonitor; // Other monitors will go here in a union
 
 export enum ApplicationName {
-    "Radarr",
-    "Sonarr",
-    "Qbittorrent",
-    "Jellyfin"
+    Radarr = "Radarr",
+    Sonarr = "Sonarr",
+    Qbittorrent = "Qbittorrent",
+    Jellyfin = "Jellyfin"
 }
 
 export interface RadarrMonitor extends BaseApplicationMonitor, DownloadClientMonitor {

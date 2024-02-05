@@ -18,7 +18,7 @@ export default class MonitorService {
 
     private initializeServices() {
         for (const instanceConfig of this.config.applications) {
-            const service = ApplicationMonitorServiceFactory.createService(instanceConfig.app, this.appEmitter);
+            const service = ApplicationMonitorServiceFactory.createService(instanceConfig, this.appEmitter);
             this.applicationServices.push(service);
         }
     }

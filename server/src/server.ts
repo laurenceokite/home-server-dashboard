@@ -3,17 +3,22 @@ import cors from "cors";
 import MonitorService from "./services/MonitorService";
 import fs from "fs";
 import { DashboardConfiguration } from "./types";
+import { AppEventEmitter } from "./events/appEmitter";
 
 const isDevEnv = process.env.NODE_ENV === 'development';
 
-const configPath = isDevEnv ? '/dashboard-config.json' : '/run/secrets/dashboard-config';
+const configPath = isDevEnv ? ('./dashboard-config.json') : ('/run/secrets/dashboard-config');
+
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8')) as DashboardConfiguration;
 
-const monitorService = new MonitorService();
+console.log(config);
+
+const appEmitter = new AppEventEmitter();
+const monitorService = new MonitorService(config, appEmitter);
 
 const app = express();
 
-if () {
+if (isDevEnv) {
     const corsOpts = {
         origin: ["http://localhost:5173"]
     };
@@ -27,14 +32,13 @@ app.get('/events', (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Send an initial message to the connected client
     res.flushHeaders();
-    res.write('retry: 10000\n\n'); // Retry every 10 seconds if the connection is lost
-
+    res.write('retry: 10000\n\n'); 
+    
+    monitorService.handleNewClient(res);
 
     req.on('close', () => {
-        console.log('Client closed connection');
-        // Stop sending events, cleanup, etc.
+        monitorService.handleClientDisconnect(res); 
     });
 });
 
