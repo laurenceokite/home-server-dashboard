@@ -1,4 +1,4 @@
-import { ApplicationMonitor, OfflineMonitor } from "../../types";
+import { ApplicationMonitor, OfflineMonitor } from "../../../../shared/types";
 import { AppEventEmitter } from "../../events/appEmitter";
 import { v4 as uuid } from "uuid"; 
 
@@ -11,6 +11,7 @@ export default abstract class ApplicationMonitorService<T extends ApplicationMon
 
     startPoll(): void {
         if (!this.intervalId) {
+            this.getStatusAndEmit(); 
             this.intervalId = setInterval(() => {
                 this.getStatusAndEmit();
             }, this.interval);

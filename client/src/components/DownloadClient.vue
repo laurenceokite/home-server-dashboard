@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import MonitorContentWrapper from "./MonitorContentWrapper.vue";
-import type { DownloadClientMonitor } from "../types";
+import type { DownloadClientMonitor } from "../../../shared/types";
 import { formatBytes } from "../utilities";
 import { Icon as iconify } from "@iconify/vue";
 

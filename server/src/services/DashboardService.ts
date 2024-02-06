@@ -1,12 +1,12 @@
-import { ApplicationMonitor, DashboardConfiguration, OfflineMonitor } from "../types";
+import { ApplicationMonitor, DashboardConfiguration, OfflineMonitor } from "../../../shared/types";
 import ApplicationMonitorServiceFactory  from "./applications/ApplicationMonitorServiceFactory";
 import ApplicationMonitorService from "./applications/ApplicationMonitorService";
 import { AppEventEmitter } from "../events/appEmitter";
 import { Response } from "express";
 import SSEClientManager from "../http/sseClientManager";
-import { SSEInitialize } from "../http/http.types";
+import { SSEInitialize } from "../../../shared/sse.types";
 
-export default class MonitorService {
+export default class DashboardService {
     private applicationServices: ApplicationMonitorService<any>[] = [];
     private latestResults = new Map<string, ApplicationMonitor | OfflineMonitor>();
     private sseClientManager: SSEClientManager = new SSEClientManager();
@@ -27,8 +27,7 @@ export default class MonitorService {
         const initMessage: SSEInitialize = {
             type: "initialize",
             timestamp: new Date(),
-            applicationIds: this.applicationServices.map(app => app.uuid),
-            latestResults: Array.from(this.latestResults.values()),
+            latestResults: this.latestResults,
         }
 
         this.sseClientManager.addClient(

@@ -1,5 +1,5 @@
 import { EventEmitter } from "stream";
-import { ApplicationMonitor, OfflineMonitor } from "../types";
+import { ApplicationMonitor, OfflineMonitor } from "../../../shared/types";
 
 export class AppEventEmitter extends EventEmitter {
     onStatusUpdate(callback: (monitor: ApplicationMonitor | OfflineMonitor) => void): void {

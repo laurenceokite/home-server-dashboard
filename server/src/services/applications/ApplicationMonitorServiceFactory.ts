@@ -1,7 +1,7 @@
 import { AppEventEmitter } from "../../events/appEmitter";
-import type { ApplicationInstance, ApplicationMonitor } from "../../types";
+import type { ApplicationInstance, ApplicationMonitor, RadarrMonitor } from "../../../../shared/types";
 import ApplicationMonitorService from "./ApplicationMonitorService";
-import { ApplicationName } from "../../types";
+import { ApplicationName } from "../../../../shared/types";
 import RadarrService from "./RadarrService";
 
 export default class ApplicationMonitorServiceFactory {
@@ -10,7 +10,7 @@ export default class ApplicationMonitorServiceFactory {
 
         switch (app) {
             case ApplicationName.Radarr:
-                return new RadarrService(instance, emitter) as ApplicationMonitorService<T>;            
+                return new RadarrService(instance as RadarrMonitor, emitter) as ApplicationMonitorService<T>;            
             default:
                 throw new Error(`Unsupported application monitor type: ${instance.app}`);
         }

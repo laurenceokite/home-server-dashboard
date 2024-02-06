@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import Radarr from "./app-monitors/Radarr.vue";
-import { type ApplicationMonitor, ApplicationName, type OfflineMonitor } from "../types";
+import { type ApplicationMonitor, ApplicationName, type OfflineMonitor } from "../../../shared/types";
 import { Icon as iconify } from "@iconify/vue";
 import { type Component, computed } from "vue";
 
@@ -66,7 +66,10 @@ const props = defineProps<{
 }>(); 
 
 const componentMap: { [K in ApplicationName]: Component } = {
-    [ApplicationName.Radarr]: Radarr
+    [ApplicationName.Radarr]: Radarr,
+    [ApplicationName.Sonarr]: Radarr,
+    [ApplicationName.Qbittorrent]: Radarr,
+    [ApplicationName.Jellyfin]: Radarr
 };
 
 const component = computed<Component | null>(() => props.monitor.up ? componentMap[props.monitor.app] : null);

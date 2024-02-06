@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { SSEMessage } from "./http.types";
+import { SSEMessage } from "../../../shared/sse.types";
 
 export default class SSEClientManager {
     private clients: Set<Response>;

@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
-import MonitorService from "./services/MonitorService";
+import MonitorService from "./services/DashboardService";
 import fs from "fs";
-import { DashboardConfiguration } from "./types";
+import { DashboardConfiguration } from "../../shared/types";
 import { AppEventEmitter } from "./events/appEmitter";
+import DashboardService from "./services/DashboardService";
 
 const isDevEnv = process.env.NODE_ENV === 'development';
 
@@ -14,7 +15,7 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8')) as DashboardConfi
 console.log(config);
 
 const appEmitter = new AppEventEmitter();
-const monitorService = new MonitorService(config, appEmitter);
+const dashboardService = new DashboardService(config, appEmitter);
 
 const app = express();
 
@@ -35,10 +36,10 @@ app.get('/events', (req, res) => {
     res.flushHeaders();
     res.write('retry: 10000\n\n'); 
     
-    monitorService.handleNewClient(res);
+    dashboardService.handleNewClient(res);
 
     req.on('close', () => {
-        monitorService.handleClientDisconnect(res); 
+        dashboardService.handleClientDisconnect(res); 
     });
 });
 

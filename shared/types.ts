@@ -1,10 +1,9 @@
-export interface Monitor {
-    up: boolean;
-    uuid: string;
-    icon?: string;
-    errors?: string[];
-    warnings?: string[];
+export type Dashboard = {
+    applications: AppMap;
 }
+
+export type AppMap = Map<string, ApplicationMonitor | OfflineMonitor>;
+export type ApplicationMonitor = RadarrMonitor | SonarrMonitor;
 
 export interface DashboardConfiguration {
     applications: ApplicationInstance<any>[]
@@ -20,9 +19,14 @@ export interface ApplicationInstance<T extends ApplicationMonitor> {
     pollIntervalMs?: number;
 }
 
-export interface BaseApplicationMonitor extends Monitor, ApplicationInstance<any> {} 
+export interface BaseApplicationMonitor extends ApplicationInstance<any> {
+    up: boolean;
+    uuid: string;
+    errors?: string[];
+    warnings?: string[];
+}
 
-export interface OfflineMonitor extends Monitor {
+export interface OfflineMonitor extends BaseApplicationMonitor {
     up: false;
 }
 
@@ -43,8 +47,6 @@ export interface DownloadClientMonitor {
     rootFolders: ApplicationFolderStatus[]; 
 }
 
-export type ApplicationMonitor = RadarrMonitor; // Other monitors will go here in a union
-
 export enum ApplicationName {
     Radarr = "Radarr",
     Sonarr = "Sonarr",
@@ -59,3 +61,5 @@ export interface RadarrMonitor extends BaseApplicationMonitor, DownloadClientMon
 export interface SonarrMonitor extends BaseApplicationMonitor, DownloadClientMonitor {
     app: ApplicationName.Sonarr;
 }
+
+

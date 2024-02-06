@@ -5,7 +5,7 @@ import type {
     RadarrMonitor, 
     OfflineMonitor, 
     ApplicationInstance 
-} from "../../types";
+} from "../../../../shared/types";
 import ApplicationMonitorService from "./ApplicationMonitorService";
 import { AppEventEmitter } from "../../events/appEmitter";
 
